@@ -23,12 +23,13 @@ def prepare(im_pth, file):
     color = [225, 225, 225]
     new_im = cv2.copyMakeBorder(im, top, bottom, left,
                                 right, cv2.BORDER_REPLICATE, value=color)
+    # TODO: adjust threshold based on signature visibility
     _, thresh1 = cv2.threshold(new_im, 127, 255, cv2.THRESH_BINARY)
     cv2.imwrite('./test/{}'.format(file), thresh1)
 
 
 def main():
-    path = './Dataset/dataset1/real'
+    path = './Dataset/dataset2/real'
     folder = os.fsencode(path)
     for file in os.listdir(folder):
         impath = folder.decode('utf-8')+'/'+file.decode('utf-8')
