@@ -3,7 +3,7 @@ import os
 
 
 def prepare(im_pth, file):
-    desired_size = 300
+    desired_size = 128
 
     im = cv2.imread(im_pth, 0)
     old_size = im.shape[:2]
@@ -26,6 +26,7 @@ def prepare(im_pth, file):
     # TODO: adjust threshold based on signature visibility
     _, thresh1 = cv2.threshold(new_im, 127, 255, cv2.THRESH_BINARY)
     cv2.imwrite('./test/{}'.format(file), thresh1)
+    return thresh1
 
 
 def main():
