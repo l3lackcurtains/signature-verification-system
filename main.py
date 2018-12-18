@@ -9,7 +9,7 @@ import preprocessing
 
 def main():
 
-    train_dir = os.fsencode('./Dataset/custom')
+    train_dir = os.fsencode('./Dataset/custom2')
     test_dir = os.fsencode('./Dataset/custom-test')
 
     training_data = []
@@ -24,9 +24,10 @@ def main():
         train_dir_decoded = train_dir.decode('utf-8')
 
         impath = train_dir_decoded+'/'+filename_decoded
+
         data = np.array(preprocessing.prepare(
             impath, filename_decoded))
-        data = np.reshape(data, (16384, 1))
+        data = np.reshape(data, (1024, 1))
 
         # TODO: Make it short and simple
         result = [0, 0, 0, 0, 0, 0]
@@ -56,22 +57,21 @@ def main():
         impath = test_dir_decoded+'/'+filename_decoded
         data = np.array(preprocessing.prepare(
             impath, filename_decoded))
-        data = np.reshape(data, (16384, 1))
+        data = np.reshape(data, (1024, 1))
         # TODO: Make it short and simple
         result = [0, 0, 0, 0, 0, 0]
-        if operator.contains(filename_decoded, 'p1'):
+        if operator.contains(filename_decoded, 't1'):
             result = [1, 0, 0, 0, 0, 0]
-        elif operator.contains(filename_decoded, 'p2'):
+        elif operator.contains(filename_decoded, 't2'):
             result = [0, 1, 0, 0, 0, 0]
-        elif operator.contains(filename_decoded, 'p3'):
+        elif operator.contains(filename_decoded, 't3'):
             result = [0, 0, 1, 0, 0, 0]
-        elif operator.contains(filename_decoded, 'p4'):
+        elif operator.contains(filename_decoded, 't4'):
             result = [0, 0, 0, 1, 0, 0]
-        elif operator.contains(filename_decoded, 'p5'):
+        elif operator.contains(filename_decoded, 't5'):
             result = [0, 0, 0, 0, 1, 0]
-        elif operator.contains(filename_decoded, 'p6'):
+        elif operator.contains(filename_decoded, 't6'):
             result = [0, 0, 0, 0, 0, 1]
-
         result = np.array(result)
         testing_data.append(data)
         testing_label.append(result)
@@ -84,7 +84,9 @@ def main():
     # creating a model
     model = keras.Sequential()
 
-    model.add(keras.layers.Flatten(input_shape=(16384, 1)))
+    model.add(keras.layers.Flatten(input_shape=(1024, 1)))
+    model.add(keras.layers.Dense(256, activation=tf.nn.sigmoid))
+    model.add(keras.layers.Dense(128, activation=tf.nn.sigmoid))
     model.add(keras.layers.Dense(256, activation=tf.nn.sigmoid))
     model.add(keras.layers.Dense(6, activation=tf.nn.softmax))
 
