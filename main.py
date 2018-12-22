@@ -10,7 +10,7 @@ import preprocessing
 def main():
 
     train_dir = os.fsencode('./Dataset/custom2')
-    test_dir = os.fsencode('./Dataset/custom-test')
+    test_dir = os.fsencode('./Dataset/custom2-test')
 
     training_data = []
     training_label = []
@@ -27,7 +27,12 @@ def main():
 
         data = np.array(preprocessing.prepare(
             impath, filename_decoded))
-        data = np.reshape(data, (1024, 1))
+        # Reshape with channel
+        data = data.reshape(1, 32, 32)
+
+        # normalize image
+        data = data.astype('float32')
+        data = data / 255
 
         # TODO: Make it short and simple
         result = [0, 0, 0, 0, 0, 0]
@@ -57,7 +62,13 @@ def main():
         impath = test_dir_decoded+'/'+filename_decoded
         data = np.array(preprocessing.prepare(
             impath, filename_decoded))
-        data = np.reshape(data, (1024, 1))
+                # Reshape with channel
+        data = data.reshape(1, 32, 32)
+
+        # normalize image
+        data = data.astype('float32')
+        data = data / 255
+        
         # TODO: Make it short and simple
         result = [0, 0, 0, 0, 0, 0]
         if operator.contains(filename_decoded, 't1'):
@@ -81,14 +92,28 @@ def main():
     testing_data = np.array(testing_data)
     testing_label = np.array(testing_label)
 
+    input_shape= (1, 32, 32)
+
     # creating a model
     model = keras.Sequential()
-
-    model.add(keras.layers.Flatten(input_shape=(1024, 1)))
-    model.add(keras.layers.Dense(256, activation=tf.nn.sigmoid))
-    model.add(keras.layers.Dense(128, activation=tf.nn.sigmoid))
-    model.add(keras.layers.Dense(256, activation=tf.nn.sigmoid))
-    model.add(keras.layers.Dense(6, activation=tf.nn.softmax))
+    # convolution Layer 1
+    model.add(keras.layers.Conv2D(16, kernel_size=(3, 3), data_format='channels_first',
+                    activation='relu',
+                    input_shape=input_shape))
+    # convolution Layer 2
+    model.add(keras.layers.Conv2D(32, (3, 3), activation='relu'))
+    # convolution Layer 3
+    model.add(keras.layers.Conv2D(16, (3, 3), activation='relu'))
+    model.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
+    model.add(keras.layers.Dropout(0.25))
+    model.add(keras.layers.Flatten())
+    # fully connected layer 1
+    model.add(keras.layers.Dense(256, activation='sigmoid'))
+    model.add(keras.layers.Dropout(0.5))
+    # fully connected layer 2
+    model.add(keras.layers.Dense(32, activation='sigmoid'))
+    # output layer
+    model.add(keras.layers.Dense(6, activation='softmax'))
 
     # compiling the model
     model.compile(loss='categorical_crossentropy',
@@ -96,7 +121,7 @@ def main():
                   metrics=['accuracy'])
 
     # Start Training
-    model.fit(training_data, training_label, epochs=25)
+    model.fit(training_data, training_label, epochs=120)
     test_loss, test_acc = model.evaluate(testing_data, testing_label)
 
     print('Test accuracy:', test_acc)
