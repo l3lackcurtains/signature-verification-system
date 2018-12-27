@@ -26,6 +26,7 @@ def prepare(im_pth, file, augment=False):
     color = [225, 225, 225]
     new_im = cv2.copyMakeBorder(im, top, bottom, left,
                                 right, cv2.BORDER_CONSTANT, value=color)
+  
     # TODO: adjust threshold based on signature visibility
     _, thresh1 = cv2.threshold(new_im, 140, 255, cv2.THRESH_BINARY)
     
