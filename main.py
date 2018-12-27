@@ -25,33 +25,34 @@ def main():
 
         impath = train_dir_decoded+'/'+filename_decoded
 
-        data = np.array(preprocessing.prepare(
-            impath, filename_decoded))
-        # Reshape with channel
-        data = data.reshape(1, 32, 32)
+        imgs = np.array(preprocessing.prepare(
+            impath, filename_decoded, augment=True))
+        
+        for data in imgs:
+            # Reshape with channel
+            data = data.reshape(1, 32, 32)
+            # normalize image
+            data = data.astype('float32')
+            data = data / 255
 
-        # normalize image
-        data = data.astype('float32')
-        data = data / 255
+            # TODO: Make it short and simple
+            result = [0, 0, 0, 0, 0, 0]
+            if operator.contains(filename_decoded, 'p1'):
+                result = [1, 0, 0, 0, 0, 0]
+            elif operator.contains(filename_decoded, 'p2'):
+                result = [0, 1, 0, 0, 0, 0]
+            elif operator.contains(filename_decoded, 'p3'):
+                result = [0, 0, 1, 0, 0, 0]
+            elif operator.contains(filename_decoded, 'p4'):
+                result = [0, 0, 0, 1, 0, 0]
+            elif operator.contains(filename_decoded, 'p5'):
+                result = [0, 0, 0, 0, 1, 0]
+            elif operator.contains(filename_decoded, 'p6'):
+                result = [0, 0, 0, 0, 0, 1]
 
-        # TODO: Make it short and simple
-        result = [0, 0, 0, 0, 0, 0]
-        if operator.contains(filename_decoded, 'p1'):
-            result = [1, 0, 0, 0, 0, 0]
-        elif operator.contains(filename_decoded, 'p2'):
-            result = [0, 1, 0, 0, 0, 0]
-        elif operator.contains(filename_decoded, 'p3'):
-            result = [0, 0, 1, 0, 0, 0]
-        elif operator.contains(filename_decoded, 'p4'):
-            result = [0, 0, 0, 1, 0, 0]
-        elif operator.contains(filename_decoded, 'p5'):
-            result = [0, 0, 0, 0, 1, 0]
-        elif operator.contains(filename_decoded, 'p6'):
-            result = [0, 0, 0, 0, 0, 1]
-
-        result = np.array(result)
-        training_data.append(data)
-        training_label.append(result)
+            result = np.array(result)
+            training_data.append(data)
+            training_label.append(result)
 
     # Get Test Data
     for filename in os.listdir(test_dir):
@@ -62,7 +63,8 @@ def main():
         impath = test_dir_decoded+'/'+filename_decoded
         data = np.array(preprocessing.prepare(
             impath, filename_decoded))
-                # Reshape with channel
+
+        # Reshape with channel
         data = data.reshape(1, 32, 32)
 
         # normalize image
@@ -87,15 +89,20 @@ def main():
         testing_data.append(data)
         testing_label.append(result)
 
+
+
+    # Create Training and Testing Sets
     training_data = np.array(training_data)
     training_label = np.array(training_label)
     testing_data = np.array(testing_data)
     testing_label = np.array(testing_label)
 
+    # input shape of image 
     input_shape= (1, 32, 32)
 
     # creating a model
     model = keras.Sequential()
+
     # convolution Layer 1
     model.add(keras.layers.Conv2D(16, kernel_size=(3, 3), data_format='channels_first',
                     activation='relu',
@@ -103,7 +110,7 @@ def main():
     # convolution Layer 2
     model.add(keras.layers.Conv2D(32, (3, 3), activation='relu'))
     # convolution Layer 3
-    model.add(keras.layers.Conv2D(16, (3, 3), activation='relu'))
+    model.add(keras.layers.Conv2D(64, (3, 3), activation='relu'))
     model.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
     model.add(keras.layers.Dropout(0.25))
     model.add(keras.layers.Flatten())
@@ -114,6 +121,8 @@ def main():
     model.add(keras.layers.Dense(32, activation='sigmoid'))
     # output layer
     model.add(keras.layers.Dense(6, activation='softmax'))
+
+
 
     # compiling the model
     model.compile(loss='categorical_crossentropy',
@@ -130,6 +139,5 @@ def main():
     predictions = model.predict(testing_data)
 
     print(predictions)
-
 
 main()
