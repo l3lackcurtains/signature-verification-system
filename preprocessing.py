@@ -47,7 +47,7 @@ def prepare(im_pth, file, augment=False):
 
 
 def main():
-    path = './ImagesData/custom2'
+    path = './Dataset/custom2'
     folder = os.fsencode(path)
     for file in os.listdir(folder):
         impath = folder.decode('utf-8')+'/'+file.decode('utf-8')
