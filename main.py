@@ -9,8 +9,8 @@ import preprocessing
 
 def main():
 
-    train_dir = os.fsencode('./Dataset/custom2')
-    test_dir = os.fsencode('./Dataset/custom2-test')
+    train_dir = os.fsencode('./ImagesData/custom2')
+    test_dir = os.fsencode('./ImagesData/custom2-test')
 
     training_data = []
     training_label = []

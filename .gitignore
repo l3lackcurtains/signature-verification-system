@@ -1,7 +1,7 @@
 .vscode/*
 temp/*
 __pycache__/*
-Dataset/custom/*
-Dataset/custom2/*
-Dataset/custom-test/*
-Dataset/custom2-test/*
+ImagesData/custom/*
+ImagesData/custom2/*
+ImagesData/custom-test/*
+ImagesData/custom2-test/*
